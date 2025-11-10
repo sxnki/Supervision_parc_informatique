@@ -20,12 +20,24 @@ Le serveur expose une page web (dashboard) affichant l'état du parc, en prioris
 - Dashboard simple affichant l’état des machines  
 - Détection et mise en évidence des anomalies (ex.temp CPU > 80°C et RAM > 80%, disque presque plein)
 
-| ID  | Fonctionnalité                        | Description                                                                                                                         | Dépendance |
-|-----|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|-------------|
-| F1  | Agent de récupération des métriques    | Récupère les informations CPU, RAM, disque et état de la connexion Internet sur chaque machine                                      | —           |
-| F2  | Envoi des données au serveur           | Transmet périodiquement les données collectées par l’agent au serveur central                                                      | F1          |
-| F3  | Serveur Flask                          | Reçoit et gère les données envoyées par les agents                                                                                 | F2          |
-| F4  | Dashboard simple                       | Affiche l’état global du parc (machines surveillées, métriques principales)                                                        | F3          |
-| F5  | Détection et mise en évidence anomalies| Analyse les données reçues pour identifier les anomalies (CPU/RAM/disque élevés)                                                   | F3          |
-| F6  | Graphiques interactifs                 | Visualise les métriques sous forme de graphiques dynamiques                                                                        | F3, F4      |
+| ID   | Fonctionnalité                              | Description                                                                                                                       | Dépendance     |
+|------|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|----------------|
+| F1   | Agent de récupération des métriques          | Récupère les informations CPU, RAM, disque et état de la connexion Internet sur chaque machine                                    | —              |
+| F2   | Envoi des données au serveur                 | Transmet périodiquement les données collectées par l’agent au serveur central                                                    | F1             |
+| F3   | Serveur Flask                                | Reçoit et gère les données envoyées par les agents                                                                               | F2             |
+| F4   | Dashboard simple                             | Affiche l’état global du parc (machines surveillées, métriques principales)                                                      | F3             |
+| F5   | Détection et mise en évidence des anomalies  | Analyse les données reçues pour identifier les anomalies (CPU/RAM/disque élevés)                                                 | F3             |
+| F6   | Graphiques interactifs                       | Visualise les métriques sous forme de graphiques dynamiques                                                                      | F3, F4         |
+| F7   | Historique des métriques                     | Enregistre les données CPU/RAM/Disque/Réseau dans une base de données pour permettre un suivi temporel                           | F1, F2, F3     |
+| F8   | Alertes en temps réel                        | Envoie un e-mail ou une notification (Slack, Telegram, etc.) en cas d’anomalie détectée                                          | F5             |
+| F9   | Authentification sur le dashboard             | Protège l’accès au tableau de bord via un login/mot de passe                                                                     | F3, F4         |
+| F10  | Filtrage et tri des machines                  | Permet de trier et filtrer les machines par taux d’utilisation CPU/RAM, état du disque, ou statut de connexion                    | F4             |
+| F11  | Export des rapports                           | Génère des rapports PDF ou CSV contenant l’état du parc et les anomalies détectées                                               | F3, F4, F5     |
+| F12  | Support multi-agents distribués               | Permet de gérer plusieurs serveurs de collecte de données répartis (scalabilité du système)                                      | F1, F2, F3     |
+| F13  | Surveillance réseau avancée                   | Ajoute la collecte de bande passante, latence et paquets perdus pour chaque machine                                              | F1             |
+| F14  | Interface d’administration                   | Permet d’ajouter/supprimer des agents surveillés directement depuis le dashboard                                                 | F4, F3         |
+| F15  | Visualisation géographique                   | Affiche les machines sur une carte avec indicateurs d’état (couleur selon le niveau de charge)                                   | F3, F4, F6     |
+| F16  | API REST publique                            | Expose les métriques et anomalies via une API pour intégration dans d’autres systèmes                                            | F3             |
+| F17  | Intelligence artificielle pour prédiction     | Implémente un modèle de machine learning prévoyant les risques de surcharge ou de panne à partir de l’historique                 | F7, F5         |
+
 
