@@ -13,27 +13,13 @@ Chaque machine surveillée dispose d'un agent qui envoie régulièrement des inf
 (CPU, RAM, espace disque,état de la connexion Internet).
 Le serveur expose une page web (dashboard) affichant l'état du parc, en priorisant les machines avec des anomalies.
 
-## Noyau et fonctionnalités  minimal  (indispensable)
-- Agent pour récupérer CPU, RAM, disque, état de la connexion Internet  
-- Envoi des données au serveur  
-- Serveur Flask qui reçoit les données  
-- Dashboard simple affichant l’état des machines  
-- Détection et mise en évidence des anomalies (ex.temp CPU > 80°C et RAM > 80%, disque presque plein)
-
-## Fonctionnalités supplémentaires
-- Graphiques interactifs des métriques (CPU/RAM/Disque/Reseaux)  
-
-## Dépendances
-- Agent -> psutil : pour récupérer CPU, RAM, espace disque  
-- Envoi des données -> requests : pour transmettre les informations au serveur  
-- Serveur -> Flask : pour recevoir les données et afficher le dashboard  
-- Graphiques -> Plotly : pour visualiser CPU, RAM et disque
-- Détection d’anomalies -> code custom : pour identifier les machines avec CPU/RAM élevés ou disque presque plein
-
-## Priorités des fonctionnalités (ordre décroissant)
-  - Agent récupérant CPU/RAM/Disque  
-  - Envoi des données au serveur  
-  - Serveur Flask  
-  - Dashboard simple  
-  - Détection et mise en évidence des anomalies  
-  - Graphiques interactifs  
++----+----------------------------------------+------------------------------------------------------------------------------------------------------------------------------------+-------------+
+| ID | Fonctionnalité                         | Description                                                                                                                        | Dépendance  |
++----+----------------------------------------+------------------------------------------------------------------------------------------------------------------------------------+-------------+
+| F1 | Agent de récupération des métriques    | Récupère les informations CPU, RAM, disque et état de la connexion Internet sur chaque machine                                     | —           |
+| F2 | Envoi des données au serveur           | Transmet périodiquement les données collectées par l’agent au serveur central                                                     | F1          |
+| F3 | Serveur Flask                          | Reçoit et gère les données envoyées par les agents                                                                                | F2          |
+| F4 | Dashboard simple                       | Affiche l’état global du parc (machines surveillées, métriques principales)                                                       | F3          |
+| F5 | Détection et mise en évidence anomalies| Analyse les données reçues pour identifier les anomalies (CPU/RAM/disque élevés)                                                  | F3          |
+| F6 | Graphiques interactifs                 | Visualise les métriques sous forme de graphiques dynamiques                                                                       | F3, F4      |
++----+----------------------------------------+------------------------------------------------------------------------------------------------------------------------------------+-------------+
