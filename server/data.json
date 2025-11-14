@@ -1,0 +1,23 @@
+[
+  {
+    "machine": "PC01",
+    "cpu": 85,
+    "ram": 70,
+    "disk": 95,
+    "timestamp": 1763134784.515973
+  },
+  {
+    "machine": "PC01",
+    "cpu": 95,
+    "ram": 30,
+    "disk": 20,
+    "timestamp": 1763135066.649706
+  },
+  {
+    "machine": "PC01",
+    "cpu": 95,
+    "ram": 30,
+    "disk": 20,
+    "timestamp": 1763135356.5573251
+  }
+]
