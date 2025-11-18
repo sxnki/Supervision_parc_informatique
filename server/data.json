@@ -1,23 +1,11 @@
 [
   {
-    "machine": "PC01",
-    "cpu": 85,
-    "ram": 70,
-    "disk": 95,
-    "timestamp": 1763134784.515973
-  },
-  {
-    "machine": "PC01",
-    "cpu": 95,
-    "ram": 30,
-    "disk": 20,
-    "timestamp": 1763135066.649706
-  },
-  {
-    "machine": "PC01",
-    "cpu": 95,
-    "ram": 30,
-    "disk": 20,
-    "timestamp": 1763135356.5573251
+    "nom": "sinkis",
+    "ip": "127.0.1.1",
+    "cpu": 40.8,
+    "ram": 16.4,
+    "disque": 61.3,
+    "temp": 51.0,
+    "etat": "connect\u00e9e"
   }
 ]

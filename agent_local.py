@@ -3,8 +3,47 @@ import requests
 import time
 import socket
 
-SERVER_URL = "http://127.0.0.1:5000/metrics"   # URL du serveur Flask
+SERVER_URL = "http://127.0.0.1:5000/metrics"  # URL du serveur Flask
 INTERVAL = 10  # intervalle d'envoi en secondes
+
+def collect_metrics():
+    "Collecte les métriques système du poste local"
+
+    # Définir hostname avant de calculer l'IP
+    hostname = socket.gethostname()
+
+    # Récupérer IP locale (fallback 0.0.0.0 si échec)
+    try:
+        ip = socket.gethostbyname(hostname)
+    except Exception:
+        ip = "0.0.0.0"
+
+    # Récupérer température CPU (si dispo)
+    temps = psutil.sensors_temperatures()
+    if temps:
+        # On prend la première valeur trouvée
+        for entries in temps.values():
+            if entries:
+                temp = entries[0].current
+                break
+        else:
+            temp = 0
+    else:
+        temp = 0
+
+    return {
+        "hostname": hostname,
+        "ip": ip,
+        "cpu": psutil.cpu_percent(interval=1),
+        "ram": psutil.virtual_memory().percent,
+        "disk": psutil.disk_usage('/').percent,
+        "network_sent": psutil.net_io_counters().bytes_sent,
+        "network_recv": psutil.net_io_counters().bytes_recv,
+        "temp": temp
+    }
+
+def send_metrics(data):
+    "Envoie les métriques collectées au serveur central Flask."
     try:
         requests.post(SERVER_URL, json=data, timeout=5)
         print("[OK] Données envoyées")
@@ -21,17 +60,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-def collect_metrics():
-    """Collecte les métriques système du poste local."""
-    return {
-        "hostname": socket.gethostname(),
-        "cpu": psutil.cpu_percent(interval=1),
-        "ram": psutil.virtual_memory().percent,
-        "disk": psutil.disk_usage('/').percent,
-        "network_sent": psutil.net_io_counters().bytes_sent,
-        "network_recv": psutil.net_io_counters().bytes_recv
-    }
-
-def send_metrics(data):
-    """Envoie les métriques collectées au serveur central Flask."""

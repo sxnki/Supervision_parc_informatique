@@ -1,0 +1,6 @@
+body { font-family: 'Segoe UI', sans-serif; }
+.sortable { cursor: pointer; }
+.alert-cell { background-color: #ff4d4d !important; color: white; font-weight: bold; }
+.warn-cell { background-color: #ffb84d !important; font-weight: bold; }
+.table-dark th, .table-dark td { vertical-align: middle; }
+#machine-details { background-color: #1e1e2f; }
