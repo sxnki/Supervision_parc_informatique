@@ -2,10 +2,10 @@
   {
     "nom": "sinkis",
     "ip": "127.0.1.1",
-    "cpu": 40.8,
-    "ram": 16.4,
-    "disque": 61.3,
-    "temp": 51.0,
+    "cpu": 48.4,
+    "ram": 23.0,
+    "disque": 61.2,
+    "temp": 53.0,
     "etat": "connect\u00e9e"
   }
 ]
