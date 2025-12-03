@@ -3,20 +3,29 @@ import requests
 import time
 import socket
 
-SERVER_URL = "http://127.0.0.1:5000/metrics"  # URL du serveur Flask
+SERVER_URL = "http://127.0.0.1:5000/upload"  # URL du serveur Flask
 INTERVAL = 10  # intervalle d'envoi en secondes
+
+def get_local_ip():
+    """Méthode simple pour récupérer l'IP locale.
+
+    Ouvre un socket UDP vers une IP publique (ne transmet pas de données)
+    et lit l'adresse locale utilisée. En cas d'échec retourne loopback.
+    """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return '127.0.0.1'
 
 def collect_metrics():
     "Collecte les métriques système du poste local"
 
-    # Définir hostname avant de calculer l'IP
-    hostname = socket.gethostname()
-
-    # Récupérer IP locale (fallback 0.0.0.0 si échec)
-    try:
-        ip = socket.gethostbyname(hostname)
-    except Exception:
-        ip = "0.0.0.0"
+    # Récupérer le nom d'hôte et l'IP locale (méthode simple)
+    ip = get_local_ip()
 
     # Récupérer température CPU (si dispo)
     temps = psutil.sensors_temperatures()
@@ -32,7 +41,7 @@ def collect_metrics():
         temp = 0
 
     return {
-        "hostname": hostname,
+        "hostname": socket.gethostname(),
         "ip": ip,
         "cpu": psutil.cpu_percent(interval=1),
         "ram": psutil.virtual_memory().percent,

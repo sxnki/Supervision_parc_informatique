@@ -32,11 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         exportCsvBtn.addEventListener('click', exportCSV);
     }
     
-    // Bouton export PDF
-    const exportPdfBtn = document.getElementById('export-pdf');
-    if (exportPdfBtn) {
-        exportPdfBtn.addEventListener('click', exportPDF);
-    }
+    // Bouton export PDF supprimé (fonction dépréciée)
     
     // Charger les données et refresh toutes les 5 secondes
     fetchData();
@@ -62,11 +58,11 @@ function renderMachinesList() {
     const container = document.getElementById('machinesList');
     container.innerHTML = '';
 
-    // Trier les machines : anomalies en premier
+    // Trier les machines : anomalies détectées côté serveur en premier
     const sortedMachines = machines.sort((a, b) => {
-        const aAnomaly = a.cpu > THRESH.cpu || a.temp > THRESH.temp;
-        const bAnomaly = b.cpu > THRESH.cpu || b.temp > THRESH.temp;
-        return bAnomaly - aAnomaly; // true (1) vient avant false (0)
+        const aAnomaly = !!a.anomalie || !!a.anomalies && Object.keys(a.anomalies).length>0;
+        const bAnomaly = !!b.anomalie || !!b.anomalies && Object.keys(b.anomalies).length>0;
+        return (bAnomaly === aAnomaly) ? 0 : (bAnomaly ? 1 : -1);
     });
 
     for(const m of sortedMachines){
@@ -76,8 +72,8 @@ function renderMachinesList() {
         const card = document.createElement('div');
         card.className = 'card text-light';
         
-        const hasAnomaly = m.cpu > THRESH.cpu || m.temp > THRESH.temp;
-        
+        const hasAnomaly = !!m.anomalie || (!!m.anomalies && Object.keys(m.anomalies).length>0);
+
         if(hasAnomaly) {
             card.classList.add('bg-danger');
         } else {
@@ -120,11 +116,37 @@ function renderOverviewCharts(){
 
     const ctxCPU = overviewCPUChart.getContext('2d');
     if(window.cpuChart) window.cpuChart.destroy();
-    window.cpuChart = new Chart(ctxCPU,{type:'bar',data:{labels, datasets:[{label:'CPU (%)', data:cpuData, backgroundColor:'rgba(54,162,235,0.7)'}]}, options:{scales:{y:{beginAtZero:true,max:100}}}});
+    window.cpuChart = new Chart(ctxCPU,{
+        type:'bar',
+        data:{
+            labels,
+            datasets:[{label:'CPU (%)', data:cpuData, backgroundColor:'rgba(54,162,235,0.9)', borderColor:'rgba(54,162,235,1)', borderWidth:1}]
+        },
+        options:{
+            plugins:{legend:{labels:{color:'#ffffff'}}},
+            scales:{
+                x:{ticks:{color:'#ffffff'}, grid:{color:'rgba(255,255,255,0.04)'}},
+                y:{beginAtZero:true,max:100,ticks:{color:'#ffffff'}, grid:{color:'rgba(255,255,255,0.06)'}}
+            }
+        }
+    });
 
     const ctxTemp = overviewTempChart.getContext('2d');
     if(window.tempChart) window.tempChart.destroy();
-    window.tempChart = new Chart(ctxTemp,{type:'bar',data:{labels, datasets:[{label:'Temp (°C)', data:tempData, backgroundColor:'rgba(255,99,132,0.7)'}]}, options:{scales:{y:{beginAtZero:true,max:120}}}});
+    window.tempChart = new Chart(ctxTemp,{
+        type:'bar',
+        data:{
+            labels,
+            datasets:[{label:'Temp (°C)', data:tempData, backgroundColor:'rgba(0,200,83,0.95)', borderColor:'rgba(0,200,83,1)', borderWidth:1}]
+        },
+        options:{
+            plugins:{legend:{labels:{color:'#ffffff'}}},
+            scales:{
+                x:{ticks:{color:'#ffffff'}, grid:{color:'rgba(255,255,255,0.04)'}},
+                y:{beginAtZero:true,max:120,ticks:{color:'#ffffff'}, grid:{color:'rgba(255,255,255,0.06)'}}
+            }
+        }
+    });
 }
 
 function showDetails(machineName){
@@ -168,11 +190,17 @@ function showDetails(machineName){
                 data:{
                     labels,
                     datasets:[
-                        {label:'CPU %', data:cpu, borderColor:'rgba(54,162,235,1)', fill:false},
-                        {label:'Temp °C', data:temp, borderColor:'rgba(255,99,132,1)', fill:false}
+                        {label:'CPU %', data:cpu, borderColor:'rgba(54,162,235,1)', backgroundColor:'rgba(54,162,235,0.2)', pointBackgroundColor:'rgba(54,162,235,1)', fill:true, tension:0.2},
+                        {label:'Temp °C', data:temp, borderColor:'rgba(0,200,83,1)', backgroundColor:'rgba(0,200,83,0.15)', pointBackgroundColor:'rgba(0,200,83,1)', fill:true, tension:0.2}
                     ]
                 },
-                options:{scales:{y:{beginAtZero:true,max:120}}}
+                options:{
+                    plugins:{legend:{labels:{color:'#ffffff'}}},
+                    scales:{
+                        x:{ticks:{color:'#ffffff'}, grid:{color:'rgba(255,255,255,0.04)'}},
+                        y:{beginAtZero:true,max:120,ticks:{color:'#ffffff'}, grid:{color:'rgba(255,255,255,0.06)'}}
+                    }
+                }
             });
         }
     }, 100);
@@ -193,7 +221,5 @@ function exportCSV(){
     URL.revokeObjectURL(url);
 }
 
-async function exportPDF(){
-    window.open('/export/pdf', '_blank'); // ouvre le PDF généré par Flask
-}
+
 
