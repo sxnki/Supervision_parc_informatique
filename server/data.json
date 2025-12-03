@@ -1,13 +1,11 @@
-```json
 [
   {
     "nom": "sinkis",
     "ip": "10.188.178.239",
-    "cpu": 18.8,
-    "ram": 18.9,
+    "cpu": 56.2,
+    "ram": 25.7,
     "disque": 61.4,
     "temp": 54.0,
     "etat": "connect\u00e9e"
   }
 ]
-```

@@ -39,7 +39,7 @@ def upload_metrics():
     else:
         machines = []
 
-    # Met à jour ou ajoute la machine ( par meziane pour implimente pdf en cours devaluation)
+    # Met à jour ou ajoute la machine ( par meziane pour manipuler les machines)
     updated = False
     for i, m in enumerate(machines):
         if m["nom"] == incoming_data["nom"]:

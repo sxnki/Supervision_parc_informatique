@@ -78,14 +78,5 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('login'))
 
-<<<<<<< HEAD
-
 if __name__ == "__main__":
-=======
-    # Ajouter date_heure formatée
-    
-
-
-    if __name__ == "__main__":
-        app.run(debug=True, port=8080)
-    DATA_FILE = os.path.join(os.path.dirname(__file__), "server","data.json")
+    app.run(debug=True, port=8080)

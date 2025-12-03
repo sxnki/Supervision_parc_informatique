@@ -68,7 +68,7 @@ def generate_machines():
    
 
 
-def get_machines_from_json(filename='datta.json'):
+def get_machines_from_json(filename='data.json'):
     """
     FONCTION: Charge les machines depuis un fichier JSON
     

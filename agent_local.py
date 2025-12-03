@@ -3,7 +3,7 @@ import requests
 import time
 import socket
 
-SERVER_URL = "http://127.0.0.1:5000/upload"  # URL du serveur Flask
+SERVER_URL = "http://127.0.0.1:5000/metrics"  # URL du serveur Flask
 INTERVAL = 10  # intervalle d'envoi en secondes
 
 def get_local_ip():
