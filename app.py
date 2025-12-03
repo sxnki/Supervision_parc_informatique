@@ -86,62 +86,6 @@ if __name__ == "__main__":
     
 
 
-@app.get("/export/pdf")
-def export_pdf():
+    if __name__ == "__main__":
+        app.run(debug=True, port=8080)
     DATA_FILE = os.path.join(os.path.dirname(__file__), "server","data.json")
-
-    # Lire les données
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r") as f:
-            machines = json.load(f)
-    else:
-        machines = []
-
-    # Ajouter anomalie et date_heure  date et herus affiche pas bien
-    for m in machines:
-        m["anomalie"] = bool(check_anomalies(m))
-        ts = m.get("timestamp", None)
-        if ts:
-            m["date_heure"] = datetime.fromtimestamp(ts).strftime("%d/%m/%Y %H:%M:%S")
-        else:
-            m["date_heure"] = "N/A"
-
-
-    # Créer le PDF
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", "B", 14)
-    pdf.cell(0, 10, "Rapport Supervision", ln=True, align="C")
-    pdf.ln(5)
-
-    headers = ["Date/Heure", "Hostname", "CPU", "RAM", "Disk", "Anomalie"]
-    pdf.set_font("Arial", "B", 10)
-    for h in headers:
-        pdf.cell(38, 7, h, 1, 0, "C")
-    pdf.ln()
-
-    pdf.set_font("Arial", "", 10)
-    for m in machines:
-        pdf.cell(38, 7, m.get("date_heure", ""), 1)
-        pdf.cell(38, 7, str(m.get("nom", "")), 1)
-        pdf.cell(38, 7, str(m.get("cpu", "")), 1)
-        pdf.cell(38, 7, str(m.get("ram", "")), 1)
-        pdf.cell(38, 7, str(m.get("disque", "")), 1)
-        pdf.cell(38, 7, str(m.get("anomalie", "")), 1)
-        pdf.ln()
-
-    # ⚡ Ici le truc correct pour BytesIO
-    pdf_output = pdf.output(dest='S').encode('latin1')  # retourne le PDF en bytes
-    pdf_bytes = BytesIO(pdf_output)
-
-    return send_file(
-        pdf_bytes,
-        mimetype="application/pdf",
-        as_attachment=True,
-        download_name="machines.pdf"
-    )
-    #créer le fichier csv !!
-
-if __name__=="__main__":
->>>>>>> 8b72958b6b92130ed761df86b61c18fcd4872060
-    app.run(debug=True, port=8080)
