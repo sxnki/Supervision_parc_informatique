@@ -1,4 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_file
+import os
+import json
+from datetime import datetime
+from io import BytesIO
+from fpdf import FPDF
+
 from machines import get_machines
 from server.utils.anomaly_detector import check_anomalies
 
@@ -78,6 +84,73 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('login'))
 
+<<<<<<< HEAD
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+=======
+    # Ajouter date_heure formatée
+    
+
+
+    @app.get("/export/pdf")
+    def export_pdf():
+        DATA_FILE = os.path.join(os.path.dirname(__file__), "server", "data.json")
+
+        # Lire les données
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r") as f:
+                machines = json.load(f)
+        else:
+            machines = []
+
+        # Ajouter anomalie et date_heure formatée
+        for m in machines:
+            try:
+                m["anomalie"] = bool(check_anomalies(m))
+            except Exception:
+                m["anomalie"] = False
+            ts = m.get("timestamp", None)
+            if ts:
+                try:
+                    m["date_heure"] = datetime.fromtimestamp(ts).strftime("%d/%m/%Y %H:%M:%S")
+                except Exception:
+                    m["date_heure"] = str(ts)
+            else:
+                m["date_heure"] = "N/A"
+
+        # Créer le PDF
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0, 10, "Rapport Supervision", ln=True, align="C")
+        pdf.ln(5)
+
+        headers = ["Date/Heure", "Hostname", "CPU", "RAM", "Disk", "Anomalie"]
+        pdf.set_font("Arial", "B", 10)
+        for h in headers:
+            pdf.cell(38, 7, h, 1, 0, "C")
+        pdf.ln()
+
+        pdf.set_font("Arial", "", 10)
+        for m in machines:
+            pdf.cell(38, 7, m.get("date_heure", ""), 1)
+            pdf.cell(38, 7, str(m.get("nom", "")), 1)
+            pdf.cell(38, 7, str(m.get("cpu", "")), 1)
+            pdf.cell(38, 7, str(m.get("ram", "")), 1)
+            pdf.cell(38, 7, str(m.get("disque", "")), 1)
+            pdf.cell(38, 7, str(m.get("anomalie", "")), 1)
+            pdf.ln()
+
+        pdf_output = pdf.output(dest='S').encode('latin1')
+        pdf_bytes = BytesIO(pdf_output)
+
+        return send_file(
+            pdf_bytes,
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name="machines.pdf"
+        )
+
+
+    if __name__ == "__main__":
+        app.run(debug=True, port=8080)

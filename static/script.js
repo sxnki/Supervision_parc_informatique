@@ -207,11 +207,10 @@ function showDetails(machineName){
 }
 
 // ============ EXPORTS ============
-
 function exportCSV(){
     const rows=[['nom','ip','cpu','ram','disque','temp','etat']];
     for(const m of machines) rows.push([m.nom,m.ip||'',m.cpu,m.ram,m.disque,m.temp,m.etat]);
-    const csv = rows.map(r=>r.map(c=>'\"'+String(c).replace(/\"/g,'\"\"')+'\"').join(',')).join('\n');
+    const csv = rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
     const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
     const url = URL.createObjectURL(blob); 
     const a=document.createElement('a'); 
@@ -220,6 +219,3 @@ function exportCSV(){
     a.click(); 
     URL.revokeObjectURL(url);
 }
-
-
-
