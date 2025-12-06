@@ -80,10 +80,6 @@ function renderMachinesList() {
             card.classList.add('bg-secondary');
         }
 
-        const statusBadge = m.etat === 'connectée' 
-            ? '<span class="badge bg-success">connectée</span>'
-            : '<span class="badge bg-secondary">déconnectée</span>';
-
         card.innerHTML = `
             <div class="card-body">
                 <h5 class="card-title">${m.nom}</h5>
@@ -93,9 +89,9 @@ function renderMachinesList() {
                     <div>RAM: ${m.ram}%</div>
                     <div>Disque: ${m.disque}%</div>
                     <div>Temp: ${m.temp}°C</div>
+                    <div>Debit: ${m.debit || 0} Mbps</div>
                 </div>
-                ${statusBadge}
-                <button class="btn btn-sm btn-primary ms-2" onclick="showDetails('${m.nom}')">Détails</button>
+                <button class="btn btn-sm btn-primary ms-2" onclick="showDetails('${m.nom}')">Details</button>
             </div>
         `;
         
@@ -206,16 +202,8 @@ function showDetails(machineName){
     }, 100);
 }
 
-// ============ EXPORTS ============
+//  EXPORTS csv 
 function exportCSV(){
-    const rows=[['nom','ip','cpu','ram','disque','temp','etat']];
-    for(const m of machines) rows.push([m.nom,m.ip||'',m.cpu,m.ram,m.disque,m.temp,m.etat]);
-    const csv = rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
-    const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob); 
-    const a=document.createElement('a'); 
-    a.href=url; 
-    a.download='machines.csv'; 
-    a.click(); 
-    URL.revokeObjectURL(url);
+    // Utiliser la route serveur pour l'export CSV
+    window.location.href = '/api/export-csv';
 }

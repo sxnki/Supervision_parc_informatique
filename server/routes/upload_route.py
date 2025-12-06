@@ -26,7 +26,7 @@ def upload_metrics():
         "ram": incoming.get("ram", 0),
         "disque": incoming.get("disk", 0),
         "temp": incoming.get("temp",0),
-        "etat": incoming.get("etat", "connectée")
+        "debit": incoming.get("debit", 0)
     }
 
     # Lit les anciennes données

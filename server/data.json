@@ -2,10 +2,10 @@
   {
     "nom": "sinkis",
     "ip": "10.188.178.239",
-    "cpu": 56.2,
-    "ram": 25.7,
-    "disque": 61.4,
-    "temp": 54.0,
-    "etat": "connect\u00e9e"
+    "cpu": 7.6,
+    "ram": 16.0,
+    "disque": 63.0,
+    "temp": 49.0,
+    "debit": 0.08
   }
 ]

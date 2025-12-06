@@ -9,8 +9,8 @@ def create_app():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     app.config["DATA FILE"] = os.path.join(base_dir, "data.json")
 
-    from server.routes.upload_route import bp as upload_bp
-    from server.routes.data_route import bp as data_bp
+    from routes.upload_route import bp as upload_bp
+    from routes.data_route import bp as data_bp
 
     app.register_blueprint(upload_bp)
     app.register_blueprint(data_bp)

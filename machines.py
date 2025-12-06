@@ -56,8 +56,7 @@ def generate_machines():
             'ram': random.randint(40, 85),  # Pourcentage RAM (40-85)
             'disque': random.randint(30, 80),  # Pourcentage disque (30-80)
             'temp': current_temp,  # Température en °C
-            'etat': 'connectée' if random.random() > 0.1 else 'déconnectée',
-            # 90% de chance d'être connectée, 10% déconnectée
+            'debit': round(random.uniform(10, 100), 2),  # Débit en MB/s
             'history': history  # 12 points historiques
         }
         
@@ -88,7 +87,7 @@ def get_machines_from_json(filename='data.json'):
             "ram": 60,
             "disque": 30,
             "temp": 50,
-            "etat": "connectée"
+            "debit": 45.5
         },
         ...
     ]
@@ -150,10 +149,14 @@ def get_machines():
     if machines is not None:
         # Fichier JSON trouvé et valide
         # Ajoute l'historique à chaque machine (s'il n'existe pas)
+        # Garde le débit existant (calculé réellement par l'agent)
         for m in machines:
             if 'history' not in m:
                 # Si pas d'historique, génère des données fictives
                 m['history'] = generate_history()
+            # Le débit est déjà présent depuis data.json (reçu de l'agent)
+            if 'debit' not in m:
+                m['debit'] = 0
         
         return machines
     
@@ -217,5 +220,5 @@ if __name__ == '__main__':
     for m in machines:
         print(f"\n📱 {m['nom']} ({m['ip']})")
         print(f"   CPU: {m['cpu']}% | RAM: {m['ram']}% | Disque: {m['disque']}%")
-        print(f"   Temp: {m['temp']}°C | État: {m['etat']}")
+        print(f"   Temp: {m['temp']}°C | Débit: {m.get('debit', 0)} MB/s")
         print(f"   Historique: {len(m.get('history', []))} points")
