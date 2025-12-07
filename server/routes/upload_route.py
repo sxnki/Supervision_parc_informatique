@@ -1,5 +1,7 @@
 from flask import Blueprint, request, current_app, jsonify
+from . import auth_route
 import json, os
+from datetime import datetime
 
 bp = Blueprint("upload", __name__)
 
@@ -7,16 +9,26 @@ bp = Blueprint("upload", __name__)
 def upload_metrics():
     """
     Route POST /metrics
-    - Reçoit les données JSON d'une machine
-    - Met à jour data.json avec ces données
-    - Formate les données pour correspondre au dashboard
+    - Recoit les donnees JSON d'une machine authentifiee
+    - Met a jour data.json avec ces donnees
+    
+    Headers requis:
+    - Authorization: Bearer <token>
     """
+    # Verifier le token d'authentification
+    auth_header = request.headers.get("Authorization", "")
+    token = auth_header.replace("Bearer ", "") if auth_header.startswith("Bearer ") else ""
+    
+    is_valid, hostname = auth_route.verify_agent_token(token)
+    if not is_valid:
+        return jsonify({"error": "Authentification requise - token invalide"}), 401
+    
     data_file = current_app.config["DATA FILE"]
     incoming = request.get_json()
 
-    # Vérifie les données ( ajouterpar meziane pour verification )
+    # Verifie les donnees
     if not incoming or "hostname" not in incoming:
-        return jsonify({"error": "Données invalides"}), 400
+        return jsonify({"error": "Donnees invalides"}), 400
 
     # Transforme les champs pour correspondre au format dashboard
     incoming_data = {
@@ -43,10 +55,26 @@ def upload_metrics():
     updated = False
     for i, m in enumerate(machines):
         if m["nom"] == incoming_data["nom"]:
+            # Conserve et enrichit l'historique si présent
+            existing_history = m.get("history", [])
+            new_point = {
+                "time": datetime.now().strftime("%H:%M:%S"),
+                "cpu": incoming_data["cpu"],
+                "temp": incoming_data["temp"]
+            }
+            history = (existing_history + [new_point])[-12:]
+            incoming_data["history"] = history
+
             machines[i] = incoming_data  # remplace l'entrée existante
             updated = True
             break
     if not updated:
+        # Crée un historique initial avec la première mesure réelle
+        incoming_data["history"] = [{
+            "time": datetime.now().strftime("%H:%M:%S"),
+            "cpu": incoming_data["cpu"],
+            "temp": incoming_data["temp"]
+        }]
         machines.append(incoming_data)
 
     # Sauvegarde dans data.json

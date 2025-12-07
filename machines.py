@@ -92,8 +92,7 @@ def get_machines_from_json(filename='data.json'):
         ...
     ]
     
-    NOTE: Le fichier JSON ne contient pas l'historique
-    L'historique sera généré manuellement si besoin
+    NOTE: L'historique est désormais alimenté par les données réelles (upload_route)
     """
     
     try:
@@ -148,54 +147,21 @@ def get_machines():
     
     if machines is not None:
         # Fichier JSON trouvé et valide
-        # Ajoute l'historique à chaque machine (s'il n'existe pas)
-        # Garde le débit existant (calculé réellement par l'agent)
+        # Garde l'historique et le débit fournis par les agents
         for m in machines:
             if 'history' not in m:
-                # Si pas d'historique, génère des données fictives
-                m['history'] = generate_history()
-            # Le débit est déjà présent depuis data.json (reçu de l'agent)
+                m['history'] = []
             if 'debit' not in m:
                 m['debit'] = 0
-        
         return machines
     
 
-    # FALLBACK: GÉNÈRE DES MACHINES SIMULÉES
-	#FAIS POUR UN REMIER TEST
+    # FALLBACK: GÉNÈRE DES MACHINES SIMULÉES (avec historique simulé inclus)
     
     print("  data.json non trouvé, utilisation de données simulées")
     print(" Conseil: Crée data.json pour utiliser vos vraies données")
     
     return generate_machines()
-
-
-# GÉNÉRER L'HISTORIQUE
-
-
-def generate_history():
-    """
-    FONCTION: Génère un historique fictif pour une machine
-    
-    UTILITÉ:
-    - Quand on charge data.json, les machines n'ont pas d'historique
-    - Cette fonction crée 12 points de données fictives
-    
-    RETOUR: Liste de 12 points d'historique
-    """
-    
-    history = []
-    
-    for minute_ago in range(11, -1, -1):
-        timestamp = (datetime.now() - timedelta(minutes=minute_ago)).strftime('%H:%M')
-        
-        history.append({
-            'time': timestamp,
-            'cpu': random.randint(20, 90),
-            'temp': random.randint(40, 80)
-        })
-    
-    return history
 
 
 # TEST DU MODULE

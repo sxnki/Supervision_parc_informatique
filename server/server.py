@@ -11,9 +11,11 @@ def create_app():
 
     from routes.upload_route import bp as upload_bp
     from routes.data_route import bp as data_bp
+    from routes.auth_route import bp as auth_bp
 
     app.register_blueprint(upload_bp)
     app.register_blueprint(data_bp)
+    app.register_blueprint(auth_bp)
 
     return app
 
