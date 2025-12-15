@@ -384,4 +384,108 @@ Chart.js (CDN v3.9.1) genere les graphiques :
 
 ## Notes
 - L'historique affiche est reel des que les agents envoient des mesures. Sans `data.json`, les donnees sont simulees (tests).
-- Les tokens agents sont en memoire (reset au redemarrage du serveur). Ajouter une persistance si besoin.
+- Les tokens agents sont en memoire (reset au redemarrage du serveur). Ajouter une persistance si besoin
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+## Développement détaillé – Contribution de Yassine:
+### server/server.py – Serveur API agents
+
+Imports :
+
+```python
+from flask import Flask
+from flask_cors import CORS
+from routes.auth_route import auth_bp
+from routes.upload_route import upload_bp
+from routes.data_route import data_bp
+```
+
+Justifications :
+J’utilise Flask pour créer l’API REST dédiée aux agents de supervision. Flask-Cors est activé afin d’autoriser les appels HTTP provenant d’agents exécutés sur des machines distantes. Les blueprints auth_bp, upload_bp et data_bp permettent de découper l’API en modules distincts et cohérents.
+
+Pourquoi ces choix :
+J’ai choisi une architecture basée sur une application factory avec create_app afin de centraliser l’initialisation du serveur. La séparation en blueprints améliore fortement la lisibilité du code, facilite la maintenance et permet d’ajouter de nouvelles routes sans modifier le cœur du serveur. Cette organisation est proche de ce qui est utilisé en contexte professionnel.
+
+---
+
+### server/routes/upload_route.py – Réception et persistance des métriques
+
+Imports :
+
+```python
+from flask import Blueprint, request, jsonify
+from datetime import datetime
+import json
+import os
+from routes.auth_route import verify_agent_token
+```
+
+Justifications :
+Blueprint est utilisé pour isoler la logique liée à la réception des métriques. request permet de récupérer les données JSON envoyées par l’agent. datetime est utilisé pour horodater chaque mesure. json et os permettent de lire et d’écrire dans le fichier data.json. verify_agent_token est appelé afin de sécuriser l’accès à la route /metrics.
+
+Fonction principale :
+La fonction upload_metrics vérifie systématiquement la présence d’un en-tête Authorization contenant un token Bearer valide. Si le token est absent ou invalide, la requête est rejetée avec un code 401. Lorsque le token est valide, les métriques envoyées par l’agent sont intégrées dans server/data.json. Les valeurs courantes de la machine sont mises à jour et un nouveau point est ajouté à l’historique, en conservant uniquement les douze derniers points.
+
+Pourquoi ces choix :
+La validation systématique du token empêche toute injection de données non autorisée. L’horodatage précis permet une visualisation temporelle cohérente dans le dashboard. La limitation à douze points garantit des graphes lisibles tout en réduisant l’occupation mémoire. L’utilisation d’un fichier JSON unique évite la complexité d’une base de données pour un projet académique de taille réduite.
+
+---
+
+### server/routes/data_route.py – Exposition des données et état du serveur
+
+Imports :
+
+```python
+from flask import Blueprint, jsonify
+import json
+import os
+```
+
+Justifications :
+Blueprint permet d’isoler les routes de consultation des données. json et os sont utilisés pour accéder au fichier data.json et vérifier son existence avant lecture.
+
+Routes implémentées :
+La route /data retourne l’intégralité du contenu de data.json au format JSON. La route /health renvoie une réponse simple confirmant que le serveur API est opérationnel.
+
+Pourquoi ces choix :
+La route /data constitue une source unique et cohérente pour le dashboard. La route /health permet de vérifier rapidement l’état du serveur lors des tests ou du débogage. La séparation stricte entre ingestion et exposition des données simplifie l’architecture globale.
+
+---
+
+### server/data.json – Modèle de persistance
+
+Le fichier data.json a été conçu comme une structure centrale regroupant toutes les informations nécessaires au dashboard. Pour chaque machine identifiée par son hostname, il contient les métriques courantes ainsi qu’un historique temporel. Cette organisation garantit que les données affichées dans les cartes et celles utilisées pour les graphiques proviennent exactement de la même source.
+
+Pourquoi ce choix :
+Le format JSON est simple à manipuler, lisible et facile à déboguer. Il est suffisant pour un nombre limité de machines et permet une validation rapide par l’enseignant. Une migration vers une base de données resterait possible si la volumétrie augmentait.
+
+---
+
+### Sécurité et cohérence de l’API
+
+L’ensemble des routes critiques que j’ai développées respecte un contrat d’API strict. Les agents doivent obligatoirement s’authentifier avant d’envoyer des métriques et les données reçues sont validées avant persistance. Les réponses HTTP sont cohérentes et directement exploitables par agent_local.py et app.py.
+
+Cette approche garantit une intégration fluide avec l’authentification des agents et avec le dashboard, sans couplage fort entre les composants.
+
+---
+
+### Justificatifs des choix techniques
+
+Architecture serveur :
+J’ai mis en place une API REST dédiée aux agents afin de séparer clairement la supervision machine de l’interface utilisateur. L’utilisation de blueprints Flask permet une organisation modulaire et pédagogique. L’application factory create_app centralise toute l’initialisation du serveur.
+
+Gestion des données :
+Le choix du JSON comme format de persistance est volontairement simple et adapté au cadre académique. L’historique glissant limite la taille des données stockées. Les mises à jour sont faites de manière cohérente afin d’éviter toute désynchronisation entre données courantes et historiques.
+
+Intégration avec le reste du projet :
+Les routes développées sont totalement compatibles avec l’authentification des agents et avec le dashboard. Les données exposées sont directement consommables par machines.py et par le frontend sans transformation supplémentaire. Le flux agent → serveur → dashboard est clair, traçable et stable.
+
+---
+
+### Conclusion sur ma contribution
+
+Ma contribution constitue le socle serveur du projet de supervision. J’ai conçu et implémenté une API robuste, sécurisée et cohérente, assurant la réception fiable des métriques, leur persistance et leur exposition au dashboard. Cette partie garantit la stabilité du système, la clarté des flux de données et une séparation nette des responsabilités, éléments essentiels pour un projet de supervision réaliste et correctement évalué sur le plan académique.
+.
